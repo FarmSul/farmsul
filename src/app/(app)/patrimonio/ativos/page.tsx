@@ -25,6 +25,7 @@ export default async function PatrimonioAtivosPage() {
     { data: colaboradores },
     { data: abastecimentosData },
     { data: combustiveisData },
+    { data: safras },
   ] = await Promise.all([
     supabase
       .from("equipamentos")
@@ -34,18 +35,19 @@ export default async function PatrimonioAtivosPage() {
       .order("nome"),
     supabase
       .from("manutencoes")
-      .select("id, equipamento_id, data, descricao, custo, nota_fiscal_url, colaboradores(nome)")
+      .select("id, equipamento_id, data, descricao, custo, nota_fiscal_url, colaboradores(nome), safras(nome)")
       .order("data", { ascending: false }),
     supabase.from("colaboradores").select("id, nome").order("nome"),
     supabase
       .from("abastecimentos")
-      .select("id, equipamento_id, data, litros, custo_total, insumos(nome)")
+      .select("id, equipamento_id, data, litros, custo_total, insumos(nome), safras(nome)")
       .order("data", { ascending: false }),
     supabase
       .from("insumos")
       .select("id, nome, unidade, estoque_atual, custo_medio")
       .eq("categoria", "combustivel")
       .order("nome"),
+    supabase.from("safras").select("id, nome").order("nome"),
   ]);
 
   const combustiveis = (combustiveisData ?? []).map((c) => ({
@@ -58,10 +60,11 @@ export default async function PatrimonioAtivosPage() {
 
   const abastecimentosPorEquipamento = new Map<
     string,
-    { id: string; data: string; litros: number; custoTotal: number; combustivelNome: string }[]
+    { id: string; data: string; litros: number; custoTotal: number; combustivelNome: string; safraNome: string | undefined }[]
   >();
   abastecimentosData?.forEach((a) => {
     const insumo = Array.isArray(a.insumos) ? a.insumos[0] : a.insumos;
+    const safra = Array.isArray(a.safras) ? a.safras[0] : a.safras;
     const lista = abastecimentosPorEquipamento.get(a.equipamento_id) ?? [];
     lista.push({
       id: a.id,
@@ -69,6 +72,7 @@ export default async function PatrimonioAtivosPage() {
       litros: a.litros,
       custoTotal: a.custo_total,
       combustivelNome: insumo?.nome ?? "—",
+      safraNome: safra?.nome,
     });
     abastecimentosPorEquipamento.set(a.equipamento_id, lista);
   });
@@ -82,10 +86,12 @@ export default async function PatrimonioAtivosPage() {
       custo: number;
       notaFiscalUrl: string | null;
       responsavelNome: string | undefined;
+      safraNome: string | undefined;
     }[]
   >();
   manutencoesData?.forEach((m) => {
     const responsavel = Array.isArray(m.colaboradores) ? m.colaboradores[0] : m.colaboradores;
+    const safra = Array.isArray(m.safras) ? m.safras[0] : m.safras;
     const lista = manutencoesPorEquipamento.get(m.equipamento_id) ?? [];
     lista.push({
       id: m.id,
@@ -94,6 +100,7 @@ export default async function PatrimonioAtivosPage() {
       custo: m.custo,
       notaFiscalUrl: m.nota_fiscal_url,
       responsavelNome: responsavel?.nome,
+      safraNome: safra?.nome,
     });
     manutencoesPorEquipamento.set(m.equipamento_id, lista);
   });
@@ -141,6 +148,7 @@ export default async function PatrimonioAtivosPage() {
                     abastecimentos={abastecimentosPorEquipamento.get(e.id) ?? []}
                     colaboradores={colaboradores ?? []}
                     combustiveis={combustiveis}
+                    safras={safras ?? []}
                     atualizarAction={atualizarEquipamento}
                     excluirAction={excluirEquipamento}
                     criarManutencaoAction={criarManutencao}

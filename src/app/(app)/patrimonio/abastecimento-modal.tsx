@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button";
 
 export type Combustivel = { id: string; nome: string; unidade: string; custoMedio: number | null; estoqueAtual: number };
 
+export type EquipamentoAbastecivel = { id: string; nome: string; horimetroAtual: number | null };
+
 export type AbastecimentoExistente = {
   id: string;
   equipamentoId: string;
   insumoId: string;
+  safraId: string | null;
   litros: number;
   custoTotal: number;
   horimetro: number | null;
@@ -23,18 +26,27 @@ export function AbastecimentoModal({
   equipamentos,
   equipamentoFixo,
   combustiveis,
+  safras,
+  safraFixa,
+  etapaFixa,
   action,
   abastecimento,
 }: {
   trigger: ReactNode;
-  equipamentos?: { id: string; nome: string }[];
-  equipamentoFixo?: { id: string; nome: string };
+  equipamentos?: EquipamentoAbastecivel[];
+  equipamentoFixo?: EquipamentoAbastecivel;
   combustiveis: Combustivel[];
+  safras?: { id: string; nome: string }[];
+  safraFixa?: { id: string; nome: string };
+  etapaFixa?: string;
   action: (formData: FormData) => void;
   abastecimento?: AbastecimentoExistente;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [equipamentoId, setEquipamentoId] = useState(
+    equipamentoFixo?.id ?? abastecimento?.equipamentoId ?? equipamentos?.[0]?.id ?? "",
+  );
   const [insumoId, setInsumoId] = useState(abastecimento?.insumoId ?? combustiveis[0]?.id ?? "");
   const [litros, setLitros] = useState(abastecimento?.litros ?? 0);
   const [custoTotal, setCustoTotal] = useState(abastecimento?.custoTotal ?? 0);
@@ -43,6 +55,7 @@ export function AbastecimentoModal({
 
   const editando = !!abastecimento;
   const combustivelSelecionado = combustiveis.find((c) => c.id === insumoId);
+  const equipamentoSelecionado = equipamentoFixo ?? equipamentos?.find((eq) => eq.id === equipamentoId);
 
   // Ao editar sem trocar o combustível, o litro desse abastecimento ainda
   // não foi devolvido ao estoque exibido — soma de volta pra validar certo.
@@ -67,6 +80,7 @@ export function AbastecimentoModal({
   }
 
   function resetar() {
+    setEquipamentoId(equipamentoFixo?.id ?? abastecimento?.equipamentoId ?? equipamentos?.[0]?.id ?? "");
     setInsumoId(abastecimento?.insumoId ?? combustiveis[0]?.id ?? "");
     setLitros(abastecimento?.litros ?? 0);
     setCustoTotal(abastecimento?.custoTotal ?? 0);
@@ -122,6 +136,7 @@ export function AbastecimentoModal({
             }}
             className="flex flex-col gap-4"
           >
+            {etapaFixa && <input type="hidden" name="etapa" value={etapaFixa} />}
             {abastecimento && <input type="hidden" name="id" value={abastecimento.id} />}
 
             {equipamentoFixo ? (
@@ -137,7 +152,8 @@ export function AbastecimentoModal({
                   id="equipamento-abastecimento"
                   name="equipamento_id"
                   required
-                  defaultValue={abastecimento?.equipamentoId ?? ""}
+                  value={equipamentoId}
+                  onChange={(e) => setEquipamentoId(e.target.value)}
                 >
                   <option value="" disabled>
                     Selecione o equipamento
@@ -217,17 +233,39 @@ export function AbastecimentoModal({
               </FieldGroup>
             </div>
 
-            <FieldGroup label="Horímetro / hodômetro atual (opcional)" htmlFor="horimetro-abastecimento">
-              <Input
-                id="horimetro-abastecimento"
-                name="horimetro"
-                type="number"
-                step="0.1"
-                min="0"
-                placeholder="0,0"
-                defaultValue={abastecimento?.horimetro ?? ""}
-              />
-            </FieldGroup>
+            {safraFixa && <input type="hidden" name="safra_id" value={safraFixa.id} />}
+
+            <div className={safraFixa ? "" : "grid grid-cols-2 gap-4"}>
+              <FieldGroup label="Horímetro / hodômetro atual (opcional)" htmlFor="horimetro-abastecimento">
+                <Input
+                  id="horimetro-abastecimento"
+                  name="horimetro"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="0,0"
+                  defaultValue={abastecimento?.horimetro ?? ""}
+                />
+                {equipamentoSelecionado?.horimetroAtual != null && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Anterior: {equipamentoSelecionado.horimetroAtual}
+                  </p>
+                )}
+              </FieldGroup>
+
+              {!safraFixa && (
+                <FieldGroup label="Safra (opcional)" htmlFor="safra-abastecimento">
+                  <Select id="safra-abastecimento" name="safra_id" defaultValue={abastecimento?.safraId ?? ""}>
+                    <option value="">Nenhuma</option>
+                    {safras?.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.nome}
+                      </option>
+                    ))}
+                  </Select>
+                </FieldGroup>
+              )}
+            </div>
 
             {erro && <p className="text-sm text-danger">{erro}</p>}
 

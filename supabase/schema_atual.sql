@@ -81,6 +81,8 @@ create table if not exists public.safras (
   data_inicio  date not null,
   data_fim     date,
   tipo_custo   text not null default 'automatico' check (tipo_custo in ('automatico', 'manual')),
+  sacas_previstas      numeric(12,2),
+  preco_saca_previsto  numeric(10,2),
   criado_em    timestamptz not null default now()
 );
 
@@ -132,6 +134,8 @@ create table if not exists public.manutencoes (
   id             uuid primary key default gen_random_uuid(),
   tenant_id      uuid not null references public.tenants(id) on delete cascade,
   equipamento_id uuid not null references public.equipamentos(id) on delete cascade,
+  safra_id       uuid references public.safras(id) on delete set null,
+  etapa          text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
   data           date not null default current_date,
   descricao      text not null,
   custo          numeric(10,2) default 0,
@@ -166,23 +170,57 @@ create table if not exists public.insumos (
   id            uuid primary key default gen_random_uuid(),
   tenant_id     uuid not null references public.tenants(id) on delete cascade,
   nome          text not null,
-  categoria     text not null check (categoria in ('semente', 'fertilizante', 'defensivo', 'combustivel', 'outro')),
+  categoria     text not null check (categoria in ('semente', 'fertilizante', 'defensivo', 'corretivo', 'combustivel', 'outro')),
   unidade       text not null check (unidade in ('kg', 'l', 'saca', 'un')),
   estoque_atual numeric(12,2) not null default 0,
   custo_medio   numeric(12,4) default 0,
+  tamanho_embalagem numeric(10,2),
   criado_em     timestamptz not null default now()
 );
 
+-- Uma "aplicação" agrupa vários insumos aplicados juntos numa mesma
+-- passada (ex: 2,4-D + glifosato) num talhão, com número de ordem (1ª, 2ª,
+-- 3ª...) dentro da etapa/safra. Cada insumo da receita vira uma linha em
+-- movimentacoes_insumo (tipo='aplicacao') referenciando aplicacao_id.
+create table if not exists public.aplicacoes (
+  id          uuid primary key default gen_random_uuid(),
+  tenant_id   uuid not null references public.tenants(id) on delete cascade,
+  safra_id    uuid references public.safras(id) on delete set null,
+  talhao_id   uuid not null references public.talhoes(id) on delete cascade,
+  etapa       text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
+  numero      integer not null default 1,
+  data        date not null default current_date,
+  criado_em   timestamptz not null default now()
+);
+
 create table if not exists public.movimentacoes_insumo (
-  id           uuid primary key default gen_random_uuid(),
-  tenant_id    uuid not null references public.tenants(id) on delete cascade,
-  insumo_id    uuid not null references public.insumos(id) on delete cascade,
-  talhao_id    uuid references public.talhoes(id) on delete set null,
-  tipo         text not null check (tipo in ('entrada', 'saida', 'aplicacao')),
-  quantidade   numeric(12,2) not null check (quantidade > 0),
-  custo_total  numeric(12,2),
-  data         date not null default current_date,
-  criado_em    timestamptz not null default now()
+  id            uuid primary key default gen_random_uuid(),
+  tenant_id     uuid not null references public.tenants(id) on delete cascade,
+  insumo_id     uuid not null references public.insumos(id) on delete cascade,
+  talhao_id     uuid references public.talhoes(id) on delete set null,
+  safra_id      uuid references public.safras(id) on delete set null,
+  etapa         text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
+  aplicacao_id  uuid references public.aplicacoes(id) on delete cascade,
+  tipo          text not null check (tipo in ('entrada', 'saida', 'aplicacao')),
+  quantidade    numeric(12,2) not null check (quantidade > 0),
+  quantidade_ha numeric(12,4),
+  custo_total   numeric(12,2),
+  data          date not null default current_date,
+  criado_em     timestamptz not null default now()
+);
+
+create table if not exists public.estoque_producao (
+  id            uuid primary key default gen_random_uuid(),
+  tenant_id     uuid not null references public.tenants(id) on delete cascade,
+  produto       text not null,
+  safra_id      uuid references public.safras(id) on delete set null,
+  etapa         text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
+  tipo          text not null check (tipo in ('entrada', 'saida')),
+  quantidade    numeric(12,2) not null check (quantidade > 0),
+  unidade       text not null default 'saca' check (unidade in ('saca', 'kg', 'ton')),
+  local         text,
+  data          date not null default current_date,
+  criado_em     timestamptz not null default now()
 );
 
 create table if not exists public.abastecimentos (
@@ -190,6 +228,8 @@ create table if not exists public.abastecimentos (
   tenant_id      uuid not null references public.tenants(id) on delete cascade,
   equipamento_id uuid not null references public.equipamentos(id) on delete cascade,
   insumo_id      uuid not null references public.insumos(id) on delete restrict,
+  safra_id       uuid references public.safras(id) on delete set null,
+  etapa          text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
   litros         numeric(10,2) not null check (litros > 0),
   custo_total    numeric(12,2) not null default 0,
   horimetro      numeric(10,1),
@@ -203,6 +243,7 @@ create table if not exists public.lancamentos_financeiros (
   propriedade_id uuid references public.propriedades(id) on delete set null,
   talhao_id      uuid references public.talhoes(id) on delete set null,
   safra_id       uuid references public.safras(id) on delete set null,
+  etapa          text check (etapa is null or etapa in ('preparo_correcao', 'plantio', 'controle_manejo', 'colheita', 'venda')),
   tipo           text not null check (tipo in ('receita', 'despesa')),
   categoria      text not null,
   descricao      text,
@@ -240,6 +281,28 @@ comment on table public.colaboradores is 'Cadastro de pessoas da fazenda — nã
 alter table public.manutencoes
   add column if not exists responsavel_id uuid references public.colaboradores(id) on delete set null;
 
+create table if not exists public.notas_fiscais (
+  id            uuid primary key default gen_random_uuid(),
+  tenant_id     uuid not null references public.tenants(id) on delete cascade,
+  numero        text not null,
+  tipo          text not null check (tipo in ('entrada', 'saida')),
+  valor         numeric(12,2) not null,
+  data_emissao  date not null default current_date,
+  descricao     text,
+  arquivo_url   text,
+  status        text not null default 'emitida' check (status in ('emitida', 'cancelada')),
+  criado_em     timestamptz not null default now()
+);
+
+create index if not exists idx_notas_fiscais_tenant on public.notas_fiscais(tenant_id);
+alter table public.notas_fiscais enable row level security;
+
+drop policy if exists "notas_fiscais: acesso restrito ao tenant" on public.notas_fiscais;
+create policy "notas_fiscais: acesso restrito ao tenant"
+  on public.notas_fiscais for all
+  using (tenant_id = public.get_tenant_id())
+  with check (tenant_id = public.get_tenant_id());
+
 -- ============================================================================
 -- ÍNDICES
 -- ============================================================================
@@ -262,9 +325,17 @@ create index if not exists idx_manutencoes_equipamento on public.manutencoes(equ
 create index if not exists idx_abastecimentos_tenant on public.abastecimentos(tenant_id);
 create index if not exists idx_abastecimentos_equipamento on public.abastecimentos(equipamento_id);
 create index if not exists idx_abastecimentos_insumo on public.abastecimentos(insumo_id);
+create index if not exists idx_manutencoes_safra on public.manutencoes(safra_id);
+create index if not exists idx_movimentacoes_insumo_safra on public.movimentacoes_insumo(safra_id);
+create index if not exists idx_estoque_producao_tenant on public.estoque_producao(tenant_id);
+create index if not exists idx_abastecimentos_safra on public.abastecimentos(safra_id);
 create index if not exists idx_insumos_tenant on public.insumos(tenant_id);
 create index if not exists idx_movimentacoes_tenant on public.movimentacoes_insumo(tenant_id);
 create index if not exists idx_movimentacoes_insumo on public.movimentacoes_insumo(insumo_id);
+create index if not exists idx_movimentacoes_insumo_aplicacao on public.movimentacoes_insumo(aplicacao_id);
+create index if not exists idx_aplicacoes_tenant on public.aplicacoes(tenant_id);
+create index if not exists idx_aplicacoes_safra on public.aplicacoes(safra_id);
+create index if not exists idx_aplicacoes_talhao on public.aplicacoes(talhao_id);
 create index if not exists idx_financeiro_tenant on public.lancamentos_financeiros(tenant_id);
 create index if not exists idx_financeiro_safra on public.lancamentos_financeiros(safra_id);
 create index if not exists idx_perfis_tenant on public.perfis(tenant_id);
@@ -382,6 +453,8 @@ alter table public.estacoes_climaticas enable row level security;
 alter table public.registros_climaticos enable row level security;
 alter table public.insumos enable row level security;
 alter table public.movimentacoes_insumo enable row level security;
+alter table public.aplicacoes enable row level security;
+alter table public.estoque_producao enable row level security;
 alter table public.abastecimentos enable row level security;
 alter table public.lancamentos_financeiros enable row level security;
 alter table public.perfis enable row level security;
@@ -546,6 +619,27 @@ create policy "admin: acesso total a movimentacoes_insumo"
   on public.movimentacoes_insumo for all
   using (public.is_admin())
   with check (public.is_admin());
+
+drop policy if exists "aplicacoes: acesso restrito ao tenant" on public.aplicacoes;
+create policy "aplicacoes: acesso restrito ao tenant"
+  on public.aplicacoes for all
+  using (tenant_id = public.get_tenant_id())
+  with check (tenant_id = public.get_tenant_id());
+
+drop policy if exists "admin: acesso total a aplicacoes" on public.aplicacoes;
+create policy "admin: acesso total a aplicacoes"
+  on public.aplicacoes for all
+  using (public.is_admin())
+  with check (public.is_admin());
+
+-- Nota: só tem a policy de tenant (sem policy de admin) — reflete o que
+-- está aplicado de verdade no banco hoje (criado assim na migration
+-- 20260910220000_modulos_pro.sql).
+drop policy if exists "estoque_producao: acesso restrito ao tenant" on public.estoque_producao;
+create policy "estoque_producao: acesso restrito ao tenant"
+  on public.estoque_producao for all
+  using (tenant_id = public.get_tenant_id())
+  with check (tenant_id = public.get_tenant_id());
 
 drop policy if exists "abastecimentos: acesso restrito ao tenant" on public.abastecimentos;
 create policy "abastecimentos: acesso restrito ao tenant"

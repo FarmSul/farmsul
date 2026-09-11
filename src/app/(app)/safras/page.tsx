@@ -1,7 +1,7 @@
 import { Sprout } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirectIfPlatformAdmin } from "@/lib/supabase/admin";
-import { criarSafra, atualizarSafra, excluirSafra } from "./actions";
+import { criarSafra, excluirSafra } from "./actions";
 import { NovaSafraModal } from "./nova-safra-modal";
 import { SafraRow } from "./safra-row";
 import { PageBanner } from "@/components/ui/page-banner";
@@ -64,29 +64,20 @@ export default async function SafrasPage() {
                 </tr>
               </thead>
               <tbody>
-                {listaSafras.map((s) => {
-                  const areas = Array.isArray(s.safra_talhoes) ? s.safra_talhoes : [];
-                  const defaultSelecionados = Object.fromEntries(
-                    areas.map((a) => [a.talhao_id, Number(a.area_ha)]),
-                  );
-                  return (
-                    <SafraRow
-                      key={s.id}
-                      id={s.id}
-                      nome={s.nome}
-                      cultura={s.cultura}
-                      dataInicio={s.data_inicio}
-                      dataFim={s.data_fim}
-                      tipoCusto={s.tipo_custo}
-                      numeroAreas={s.numeroAreas}
-                      areaTotal={s.areaTotal}
-                      talhoes={talhoes}
-                      defaultSelecionados={defaultSelecionados}
-                      atualizarAction={atualizarSafra}
-                      excluirAction={excluirSafra}
-                    />
-                  );
-                })}
+                {listaSafras.map((s) => (
+                  <SafraRow
+                    key={s.id}
+                    id={s.id}
+                    nome={s.nome}
+                    cultura={s.cultura}
+                    dataInicio={s.data_inicio}
+                    dataFim={s.data_fim}
+                    tipoCusto={s.tipo_custo}
+                    numeroAreas={s.numeroAreas}
+                    areaTotal={s.areaTotal}
+                    excluirAction={excluirSafra}
+                  />
+                ))}
               </tbody>
             </table>
           </div>

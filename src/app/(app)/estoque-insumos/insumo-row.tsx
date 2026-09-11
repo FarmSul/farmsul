@@ -10,6 +10,7 @@ const CATEGORIA_LABELS: Record<string, string> = {
   semente: "Semente",
   fertilizante: "Fertilizante",
   defensivo: "Defensivo",
+  corretivo: "Corretivo",
   combustivel: "Combustível",
   outro: "Outro",
 };
@@ -21,6 +22,7 @@ export function InsumoRow({
   unidade,
   estoqueAtual,
   custoMedio,
+  tamanhoEmbalagem,
   atualizarAction,
   excluirAction,
 }: {
@@ -30,6 +32,7 @@ export function InsumoRow({
   unidade: string;
   estoqueAtual: number;
   custoMedio: number | null;
+  tamanhoEmbalagem: number | null;
   atualizarAction: (formData: FormData) => void;
   excluirAction: (formData: FormData) => void;
 }) {
@@ -47,6 +50,12 @@ export function InsumoRow({
           </td>
           <td className="px-6 py-3.5 text-muted-foreground">
             {estoqueAtual} {unidade}
+            {tamanhoEmbalagem ? (
+              <span className="text-xs">
+                {" "}
+                · {(estoqueAtual / tamanhoEmbalagem).toFixed(1)} emb. de {tamanhoEmbalagem} {unidade}
+              </span>
+            ) : null}
           </td>
           <td className="px-6 py-3.5 text-muted-foreground">{custoMedio ? `R$ ${custoMedio}` : "—"}</td>
           <td className="px-6 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
@@ -72,6 +81,7 @@ export function InsumoRow({
         defaultUnidade={unidade}
         defaultEstoqueAtual={estoqueAtual}
         defaultCustoMedio={custoMedio ?? ""}
+        defaultTamanhoEmbalagem={tamanhoEmbalagem ?? ""}
       />
     </FormModal>
   );

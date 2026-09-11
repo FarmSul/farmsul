@@ -2,7 +2,12 @@
 
 import { Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/ui/confirm-button";
-import { AbastecimentoModal, type AbastecimentoExistente, type Combustivel } from "../abastecimento-modal";
+import {
+  AbastecimentoModal,
+  type AbastecimentoExistente,
+  type Combustivel,
+  type EquipamentoAbastecivel,
+} from "../abastecimento-modal";
 
 function formatBRL(valor: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
@@ -12,16 +17,20 @@ export function AbastecimentoRow({
   abastecimento,
   equipamentoNome,
   combustivelNome,
+  safraNome,
   equipamentos,
   combustiveis,
+  safras,
   atualizarAction,
   excluirAction,
 }: {
   abastecimento: AbastecimentoExistente;
   equipamentoNome: string;
   combustivelNome: string;
-  equipamentos: { id: string; nome: string }[];
+  safraNome: string | undefined;
+  equipamentos: EquipamentoAbastecivel[];
   combustiveis: Combustivel[];
+  safras: { id: string; nome: string }[];
   atualizarAction: (formData: FormData) => void;
   excluirAction: (formData: FormData) => void;
 }) {
@@ -29,6 +38,7 @@ export function AbastecimentoRow({
     <AbastecimentoModal
       equipamentos={equipamentos}
       combustiveis={combustiveis}
+      safras={safras}
       abastecimento={abastecimento}
       action={atualizarAction}
       trigger={
@@ -41,6 +51,7 @@ export function AbastecimentoRow({
           <td className="px-6 py-3.5 text-muted-foreground">{abastecimento.litros} L</td>
           <td className="px-6 py-3.5 text-muted-foreground">{formatBRL(abastecimento.custoTotal)}</td>
           <td className="px-6 py-3.5 text-muted-foreground">{abastecimento.horimetro ?? "—"}</td>
+          <td className="px-6 py-3.5 text-muted-foreground">{safraNome ?? "—"}</td>
           <td className="px-6 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
             <form action={excluirAction}>
               <input type="hidden" name="id" value={abastecimento.id} />

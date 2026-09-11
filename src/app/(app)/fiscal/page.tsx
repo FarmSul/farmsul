@@ -1,4 +1,4 @@
-import { FileCheck2, Ban, Trash2 } from "lucide-react";
+import { FileCheck2, Ban, Trash2, Paperclip } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirectIfPlatformAdmin } from "@/lib/supabase/admin";
 import { criarNotaFiscal, cancelarNotaFiscal, excluirNotaFiscal } from "./actions";
@@ -19,7 +19,7 @@ export default async function FiscalPage() {
 
   const { data: notas } = await supabase
     .from("notas_fiscais")
-    .select("id, numero, tipo, valor, data_emissao, descricao, status")
+    .select("id, numero, tipo, valor, data_emissao, descricao, status, arquivo_url")
     .order("data_emissao", { ascending: false });
 
   return (
@@ -66,6 +66,17 @@ export default async function FiscalPage() {
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <div className="flex justify-end gap-1">
+                        {n.arquivo_url && (
+                          <a
+                            href={n.arquivo_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Ver arquivo da nota"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-hover hover:text-primary"
+                          >
+                            <Paperclip className="h-4 w-4" />
+                          </a>
+                        )}
                         {n.status === "emitida" && (
                           <form action={cancelarNotaFiscal}>
                             <input type="hidden" name="id" value={n.id} />

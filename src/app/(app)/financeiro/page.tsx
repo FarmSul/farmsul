@@ -18,10 +18,13 @@ export default async function FinanceiroPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
 
-  const { data: lancamentos } = await supabase
-    .from("lancamentos_financeiros")
-    .select("id, tipo, categoria, descricao, valor, status, data")
-    .order("data", { ascending: false });
+  const [{ data: lancamentos }, { data: safras }] = await Promise.all([
+    supabase
+      .from("lancamentos_financeiros")
+      .select("id, tipo, categoria, descricao, valor, status, data, safras(nome)")
+      .order("data", { ascending: false }),
+    supabase.from("safras").select("id, nome").order("nome"),
+  ]);
 
   const realizados = (lancamentos ?? []).filter((l) => l.status === "realizado");
   const receitas = realizados.filter((l) => l.tipo === "receita").reduce((s, l) => s + l.valor, 0);
@@ -43,7 +46,7 @@ export default async function FinanceiroPage() {
       </div>
 
       <div className="mb-4 flex justify-end">
-        <NovoLancamentoModal action={criarLancamento} />
+        <NovoLancamentoModal action={criarLancamento} safras={safras ?? []} />
       </div>
 
       <Card>
@@ -55,13 +58,16 @@ export default async function FinanceiroPage() {
                   <th className="px-6 py-3 font-medium">Categoria</th>
                   <th className="px-6 py-3 font-medium">Tipo</th>
                   <th className="px-6 py-3 font-medium">Valor</th>
+                  <th className="px-6 py-3 font-medium">Safra</th>
                   <th className="px-6 py-3 font-medium">Status</th>
                   <th className="px-6 py-3 font-medium">Data</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
-                {lancamentos.map((l) => (
+                {lancamentos.map((l) => {
+                  const safra = Array.isArray(l.safras) ? l.safras[0] : l.safras;
+                  return (
                   <tr key={l.id} className="border-b border-border last:border-0 hover:bg-surface-hover">
                     <td className="px-6 py-3.5 font-medium text-foreground">
                       {l.categoria}
@@ -71,6 +77,7 @@ export default async function FinanceiroPage() {
                       <Badge tone={l.tipo === "receita" ? "primary" : "danger"}>{l.tipo}</Badge>
                     </td>
                     <td className="px-6 py-3.5 text-muted-foreground">{formatBRL(l.valor)}</td>
+                    <td className="px-6 py-3.5 text-muted-foreground">{safra?.nome ?? "—"}</td>
                     <td className="px-6 py-3.5">
                       <Badge tone={l.status === "realizado" ? "neutral" : "amber"}>{l.status}</Badge>
                     </td>
@@ -88,7 +95,8 @@ export default async function FinanceiroPage() {
                       </form>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -88,6 +88,29 @@ export async function atualizarSafra(formData: FormData) {
 
   revalidatePath("/safras");
   revalidatePath("/talhoes");
+  revalidatePath(`/safras/${id}`);
+}
+
+export async function atualizarSimulacaoSafra(formData: FormData) {
+  const supabase = await createClient();
+
+  const id = formData.get("id") as string;
+  const sacasRaw = formData.get("sacas_previstas") as string;
+  const precoRaw = formData.get("preco_saca_previsto") as string;
+
+  const { error } = await supabase
+    .from("safras")
+    .update({
+      sacas_previstas: sacasRaw ? Number(sacasRaw) : null,
+      preco_saca_previsto: precoRaw ? Number(precoRaw) : null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath(`/safras/${id}`);
 }
 
 export async function excluirSafra(formData: FormData) {

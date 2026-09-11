@@ -1,11 +1,14 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus, Paperclip } from "lucide-react";
 import { FormModal } from "@/components/ui/form-modal";
 import { FieldGroup, Input, Select } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 
 export function NovaNotaModal({ action }: { action: (formData: FormData) => void }) {
+  const [arquivoNome, setArquivoNome] = useState<string | null>(null);
+
   return (
     <FormModal
       title="Nova nota fiscal"
@@ -41,6 +44,25 @@ export function NovaNotaModal({ action }: { action: (formData: FormData) => void
         <FieldGroup label="Data de emissão" htmlFor="data-nf">
           <Input id="data-nf" name="data_emissao" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
         </FieldGroup>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="mb-1.5 block text-sm font-medium text-foreground">Arquivo da nota (opcional)</span>
+        <label
+          htmlFor="arquivo-nf"
+          className="flex h-[38px] w-fit cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-sm text-muted-foreground hover:bg-surface-hover"
+        >
+          <Paperclip className="h-4 w-4" />
+          <span className="max-w-[220px] truncate">{arquivoNome ?? "Anexar PDF ou imagem"}</span>
+        </label>
+        <input
+          id="arquivo-nf"
+          name="arquivo"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          className="hidden"
+          onChange={(e) => setArquivoNome(e.target.files?.[0]?.name ?? null)}
+        />
       </div>
     </FormModal>
   );

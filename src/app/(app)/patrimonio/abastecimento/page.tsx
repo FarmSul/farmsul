@@ -14,18 +14,28 @@ export default async function AbastecimentoPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
 
-  const [{ data: abastecimentos }, { data: equipamentos }, { data: combustiveisData }] = await Promise.all([
-    supabase
-      .from("abastecimentos")
-      .select("id, equipamento_id, insumo_id, litros, custo_total, horimetro, data, equipamentos(nome), insumos(nome)")
-      .order("data", { ascending: false }),
-    supabase.from("equipamentos").select("id, nome").order("nome"),
-    supabase
-      .from("insumos")
-      .select("id, nome, unidade, estoque_atual, custo_medio")
-      .eq("categoria", "combustivel")
-      .order("nome"),
-  ]);
+  const [{ data: abastecimentos }, { data: equipamentos }, { data: combustiveisData }, { data: safras }] =
+    await Promise.all([
+      supabase
+        .from("abastecimentos")
+        .select(
+          "id, equipamento_id, insumo_id, safra_id, litros, custo_total, horimetro, data, equipamentos(nome), insumos(nome), safras(nome)",
+        )
+        .order("data", { ascending: false }),
+      supabase.from("equipamentos").select("id, nome, horimetro_atual").order("nome"),
+      supabase
+        .from("insumos")
+        .select("id, nome, unidade, estoque_atual, custo_medio")
+        .eq("categoria", "combustivel")
+        .order("nome"),
+      supabase.from("safras").select("id, nome").order("nome"),
+    ]);
+
+  const equipamentosAbastecimento = (equipamentos ?? []).map((eq) => ({
+    id: eq.id,
+    nome: eq.nome,
+    horimetroAtual: eq.horimetro_atual,
+  }));
 
   const combustiveis = (combustiveisData ?? []).map((c) => ({
     id: c.id,
@@ -58,8 +68,9 @@ export default async function AbastecimentoPage() {
       <div className="mb-4 flex justify-end">
         {combustiveis.length ? (
           <AbastecimentoModal
-            equipamentos={equipamentos ?? []}
+            equipamentos={equipamentosAbastecimento}
             combustiveis={combustiveis}
+            safras={safras ?? []}
             action={criarAbastecimento}
             trigger={
               <Button type="button">
@@ -92,6 +103,7 @@ export default async function AbastecimentoPage() {
                   <th className="px-6 py-3 font-medium">Litros</th>
                   <th className="px-6 py-3 font-medium">Custo</th>
                   <th className="px-6 py-3 font-medium">Horímetro</th>
+                  <th className="px-6 py-3 font-medium">Safra</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
@@ -99,17 +111,21 @@ export default async function AbastecimentoPage() {
                 {abastecimentos.map((a) => {
                   const equipamento = Array.isArray(a.equipamentos) ? a.equipamentos[0] : a.equipamentos;
                   const insumo = Array.isArray(a.insumos) ? a.insumos[0] : a.insumos;
+                  const safra = Array.isArray(a.safras) ? a.safras[0] : a.safras;
                   return (
                     <AbastecimentoRow
                       key={a.id}
                       equipamentoNome={equipamento?.nome ?? "—"}
                       combustivelNome={insumo?.nome ?? "—"}
-                      equipamentos={equipamentos ?? []}
+                      safraNome={safra?.nome}
+                      equipamentos={equipamentosAbastecimento}
                       combustiveis={combustiveis}
+                      safras={safras ?? []}
                       abastecimento={{
                         id: a.id,
                         equipamentoId: a.equipamento_id,
                         insumoId: a.insumo_id,
+                        safraId: a.safra_id,
                         litros: a.litros,
                         custoTotal: a.custo_total,
                         horimetro: a.horimetro,

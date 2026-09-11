@@ -20,6 +20,7 @@ type Manutencao = {
   custo: number;
   notaFiscalUrl: string | null;
   responsavelNome: string | undefined;
+  safraNome: string | undefined;
 };
 
 type Abastecimento = {
@@ -28,6 +29,7 @@ type Abastecimento = {
   litros: number;
   custoTotal: number;
   combustivelNome: string;
+  safraNome: string | undefined;
 };
 
 const TABS = [
@@ -146,11 +148,13 @@ function DadosTab({
 function HistoricoTab({
   equipamentoId,
   equipamentoNome,
+  horimetroAtual,
   dataAquisicao,
   manutencoes,
   abastecimentos,
   colaboradores,
   combustiveis,
+  safras,
   criarManutencaoAction,
   excluirManutencaoAction,
   criarAbastecimentoAction,
@@ -158,11 +162,13 @@ function HistoricoTab({
 }: {
   equipamentoId: string;
   equipamentoNome: string;
+  horimetroAtual: number | null;
   dataAquisicao: string | null;
   manutencoes: Manutencao[];
   abastecimentos: Abastecimento[];
   colaboradores: { id: string; nome: string }[];
   combustiveis: Combustivel[];
+  safras: { id: string; nome: string }[];
   criarManutencaoAction: (formData: FormData) => void;
   excluirManutencaoAction: (formData: FormData) => void;
   criarAbastecimentoAction: (formData: FormData) => void;
@@ -179,6 +185,7 @@ function HistoricoTab({
         <AbrirManutencaoModal
           equipamentoFixo={{ id: equipamentoId, nome: equipamentoNome }}
           colaboradores={colaboradores}
+          safras={safras}
           action={criarManutencaoAction}
           trigger={
             <Button type="button" variant="secondary">
@@ -189,8 +196,9 @@ function HistoricoTab({
         />
         {combustiveis.length > 0 && (
           <AbastecimentoModal
-            equipamentoFixo={{ id: equipamentoId, nome: equipamentoNome }}
+            equipamentoFixo={{ id: equipamentoId, nome: equipamentoNome, horimetroAtual }}
             combustiveis={combustiveis}
+            safras={safras}
             action={criarAbastecimentoAction}
             trigger={
               <Button type="button" variant="secondary">
@@ -215,6 +223,7 @@ function HistoricoTab({
                   <p className="text-xs text-muted-foreground">
                     {formatDataLonga(e.data)}
                     {e.responsavelNome && ` · ${e.responsavelNome}`}
+                    {e.safraNome && ` · ${e.safraNome}`}
                     {e.custo > 0 &&
                       ` · ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(e.custo)}`}
                   </p>
@@ -253,6 +262,7 @@ function HistoricoTab({
                   <p className="text-xs text-muted-foreground">
                     {formatDataLonga(e.data)} ·{" "}
                     {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(e.custoTotal)}
+                    {e.safraNome && ` · ${e.safraNome}`}
                   </p>
                 </div>
                 <form action={excluirAbastecimentoAction}>
@@ -308,6 +318,7 @@ export function EquipamentoRow({
   abastecimentos,
   colaboradores,
   combustiveis,
+  safras,
   atualizarAction,
   excluirAction,
   criarManutencaoAction,
@@ -334,6 +345,7 @@ export function EquipamentoRow({
   abastecimentos: Abastecimento[];
   colaboradores: { id: string; nome: string }[];
   combustiveis: Combustivel[];
+  safras: { id: string; nome: string }[];
   atualizarAction: (formData: FormData) => void;
   excluirAction: (formData: FormData) => void;
   criarManutencaoAction: (formData: FormData) => void;
@@ -439,11 +451,13 @@ export function EquipamentoRow({
               <HistoricoTab
                 equipamentoId={id}
                 equipamentoNome={nome}
+                horimetroAtual={horimetroAtual}
                 dataAquisicao={dataAquisicao}
                 manutencoes={manutencoes}
                 abastecimentos={abastecimentos}
                 colaboradores={colaboradores}
                 combustiveis={combustiveis}
+                safras={safras}
                 criarManutencaoAction={criarManutencaoAction}
                 excluirManutencaoAction={excluirManutencaoAction}
                 criarAbastecimentoAction={criarAbastecimentoAction}

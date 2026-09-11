@@ -3,28 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/supabase/tenant";
-
-async function uploadArquivo(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  bucket: string,
-  tenant_id: string,
-  prefixo: string,
-  arquivo: File,
-) {
-  const extensao = arquivo.name.split(".").pop() ?? "bin";
-  const caminho = `${tenant_id}/${prefixo}-${Date.now()}.${extensao}`;
-
-  const { error } = await supabase.storage.from(bucket).upload(caminho, arquivo, {
-    upsert: true,
-    contentType: arquivo.type,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return supabase.storage.from(bucket).getPublicUrl(caminho).data.publicUrl;
-}
+import { uploadArquivo } from "@/lib/supabase/storage";
 
 async function uploadFoto(supabase: Awaited<ReturnType<typeof createClient>>, tenant_id: string, foto: File) {
   return uploadArquivo(supabase, "equipamentos", tenant_id, "equipamento", foto);
@@ -125,6 +104,8 @@ export async function criarManutencao(formData: FormData) {
   const pecas: PecaManutencao[] = pecasRaw ? JSON.parse(pecasRaw) : [];
   const notaFiscal = formData.get("nota_fiscal") as File | null;
   const responsavel_id = (formData.get("responsavel_id") as string) || null;
+  const safra_id = (formData.get("safra_id") as string) || null;
+  const etapa = (formData.get("etapa") as string) || null;
 
   const totalPecas = pecas.reduce((soma, p) => soma + p.quantidade * p.valor_unitario, 0);
   const custo = mao_de_obra + totalPecas;
@@ -143,6 +124,8 @@ export async function criarManutencao(formData: FormData) {
     mao_de_obra,
     pecas,
     responsavel_id,
+    safra_id,
+    etapa,
     nota_fiscal_url,
   });
 
@@ -152,6 +135,7 @@ export async function criarManutencao(formData: FormData) {
 
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/manutencao");
+  if (safra_id) revalidatePath(`/safras/${safra_id}`);
 }
 
 export async function atualizarManutencao(formData: FormData) {
@@ -168,6 +152,7 @@ export async function atualizarManutencao(formData: FormData) {
   const pecas: PecaManutencao[] = pecasRaw ? JSON.parse(pecasRaw) : [];
   const notaFiscal = formData.get("nota_fiscal") as File | null;
   const responsavel_id = (formData.get("responsavel_id") as string) || null;
+  const safra_id = (formData.get("safra_id") as string) || null;
 
   const totalPecas = pecas.reduce((soma, p) => soma + p.quantidade * p.valor_unitario, 0);
   const custo = mao_de_obra + totalPecas;
@@ -180,11 +165,18 @@ export async function atualizarManutencao(formData: FormData) {
     mao_de_obra,
     pecas,
     responsavel_id,
+    safra_id,
   };
+
+  if (formData.has("etapa")) {
+    dados.etapa = (formData.get("etapa") as string) || null;
+  }
 
   if (notaFiscal && notaFiscal.size > 0) {
     dados.nota_fiscal_url = await uploadArquivo(supabase, "notas-fiscais", tenant_id, "nota-fiscal", notaFiscal);
   }
+
+  const { data: anterior } = await supabase.from("manutencoes").select("safra_id").eq("id", id).single();
 
   const { error } = await supabase.from("manutencoes").update(dados).eq("id", id);
 
@@ -194,11 +186,15 @@ export async function atualizarManutencao(formData: FormData) {
 
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/manutencao");
+  if (safra_id) revalidatePath(`/safras/${safra_id}`);
+  if (anterior?.safra_id && anterior.safra_id !== safra_id) revalidatePath(`/safras/${anterior.safra_id}`);
 }
 
 export async function excluirManutencao(formData: FormData) {
   const supabase = await createClient();
   const id = formData.get("id") as string;
+
+  const { data: atual } = await supabase.from("manutencoes").select("safra_id").eq("id", id).single();
 
   const { error } = await supabase.from("manutencoes").delete().eq("id", id);
 
@@ -208,6 +204,7 @@ export async function excluirManutencao(formData: FormData) {
 
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/manutencao");
+  if (atual?.safra_id) revalidatePath(`/safras/${atual.safra_id}`);
 }
 
 async function ajustarEstoqueInsumo(
@@ -247,10 +244,12 @@ export async function criarAbastecimento(formData: FormData) {
   const horimetroRaw = formData.get("horimetro") as string;
   const horimetro = horimetroRaw ? Number(horimetroRaw) : null;
   const data = formData.get("data") as string;
+  const safra_id = (formData.get("safra_id") as string) || null;
+  const etapa = (formData.get("etapa") as string) || null;
 
   const { error } = await supabase
     .from("abastecimentos")
-    .insert({ tenant_id, equipamento_id, insumo_id, litros, custo_total, horimetro, data });
+    .insert({ tenant_id, equipamento_id, insumo_id, litros, custo_total, horimetro, data, safra_id, etapa });
 
   if (error) {
     throw new Error(error.message);
@@ -258,10 +257,15 @@ export async function criarAbastecimento(formData: FormData) {
 
   await ajustarEstoqueInsumo(supabase, insumo_id, -litros);
 
+  if (horimetro != null) {
+    await supabase.from("equipamentos").update({ horimetro_atual: horimetro }).eq("id", equipamento_id);
+  }
+
   revalidatePath("/patrimonio");
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/abastecimento");
   revalidatePath("/estoque-insumos");
+  if (safra_id) revalidatePath(`/safras/${safra_id}`);
 }
 
 export async function atualizarAbastecimento(formData: FormData) {
@@ -276,10 +280,11 @@ export async function atualizarAbastecimento(formData: FormData) {
   const horimetroRaw = formData.get("horimetro") as string;
   const horimetro = horimetroRaw ? Number(horimetroRaw) : null;
   const data = formData.get("data") as string;
+  const safra_id = (formData.get("safra_id") as string) || null;
 
   const { data: atual, error: buscaError } = await supabase
     .from("abastecimentos")
-    .select("insumo_id, litros")
+    .select("insumo_id, litros, safra_id")
     .eq("id", id)
     .single();
 
@@ -292,9 +297,14 @@ export async function atualizarAbastecimento(formData: FormData) {
   await ajustarEstoqueInsumo(supabase, atual.insumo_id, atual.litros);
   await ajustarEstoqueInsumo(supabase, insumo_id, -litros);
 
+  const dadosAtualizados: Record<string, unknown> = { equipamento_id, insumo_id, litros, custo_total, horimetro, data, safra_id };
+  if (formData.has("etapa")) {
+    dadosAtualizados.etapa = (formData.get("etapa") as string) || null;
+  }
+
   const { error } = await supabase
     .from("abastecimentos")
-    .update({ equipamento_id, insumo_id, litros, custo_total, horimetro, data })
+    .update(dadosAtualizados)
     .eq("id", id);
 
   if (error) {
@@ -305,6 +315,8 @@ export async function atualizarAbastecimento(formData: FormData) {
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/abastecimento");
   revalidatePath("/estoque-insumos");
+  if (safra_id) revalidatePath(`/safras/${safra_id}`);
+  if (atual.safra_id && atual.safra_id !== safra_id) revalidatePath(`/safras/${atual.safra_id}`);
 }
 
 export async function excluirAbastecimento(formData: FormData) {
@@ -313,7 +325,7 @@ export async function excluirAbastecimento(formData: FormData) {
 
   const { data: atual, error: buscaError } = await supabase
     .from("abastecimentos")
-    .select("insumo_id, litros")
+    .select("insumo_id, litros, safra_id")
     .eq("id", id)
     .single();
 
@@ -333,4 +345,5 @@ export async function excluirAbastecimento(formData: FormData) {
   revalidatePath("/patrimonio/ativos");
   revalidatePath("/patrimonio/abastecimento");
   revalidatePath("/estoque-insumos");
+  if (atual.safra_id) revalidatePath(`/safras/${atual.safra_id}`);
 }

@@ -4,7 +4,6 @@ import { redirectIfPlatformAdmin } from "@/lib/supabase/admin";
 import { criarInsumo, atualizarInsumo, excluirInsumo } from "./actions";
 import { NovoInsumoModal } from "./novo-insumo-modal";
 import { InsumoRow } from "./insumo-row";
-import { PageBanner } from "@/components/ui/page-banner";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -14,18 +13,11 @@ export default async function EstoqueInsumosPage() {
 
   const { data: insumos } = await supabase
     .from("insumos")
-    .select("id, nome, categoria, unidade, estoque_atual, custo_medio")
+    .select("id, nome, categoria, unidade, estoque_atual, custo_medio, tamanho_embalagem")
     .order("nome");
 
   return (
     <div>
-      <PageBanner
-        icon={Database}
-        title="Estoque de Insumos"
-        description="Sementes, fertilizantes e defensivos disponíveis."
-        tags={["Insumos", "Estoque"]}
-      />
-
       <div className="mb-4 flex justify-end">
         <NovoInsumoModal action={criarInsumo} />
       </div>
@@ -53,6 +45,7 @@ export default async function EstoqueInsumosPage() {
                     unidade={i.unidade}
                     estoqueAtual={i.estoque_atual}
                     custoMedio={i.custo_medio}
+                    tamanhoEmbalagem={i.tamanho_embalagem}
                     atualizarAction={atualizarInsumo}
                     excluirAction={excluirInsumo}
                   />

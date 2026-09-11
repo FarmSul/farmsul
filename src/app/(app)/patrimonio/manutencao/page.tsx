@@ -12,16 +12,18 @@ export default async function PatrimonioManutencaoPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
 
-  const [{ data: manutencoes }, { data: equipamentos }, { data: colaboradores }] = await Promise.all([
-    supabase
-      .from("manutencoes")
-      .select(
-        "id, equipamento_id, data, descricao, custo, mao_de_obra, pecas, responsavel_id, nota_fiscal_url, equipamentos(nome), colaboradores(nome)",
-      )
-      .order("data", { ascending: false }),
-    supabase.from("equipamentos").select("id, nome").order("nome"),
-    supabase.from("colaboradores").select("id, nome").order("nome"),
-  ]);
+  const [{ data: manutencoes }, { data: equipamentos }, { data: colaboradores }, { data: safras }] =
+    await Promise.all([
+      supabase
+        .from("manutencoes")
+        .select(
+          "id, equipamento_id, data, descricao, custo, mao_de_obra, pecas, responsavel_id, safra_id, nota_fiscal_url, equipamentos(nome), colaboradores(nome), safras(nome)",
+        )
+        .order("data", { ascending: false }),
+      supabase.from("equipamentos").select("id, nome").order("nome"),
+      supabase.from("colaboradores").select("id, nome").order("nome"),
+      supabase.from("safras").select("id, nome").order("nome"),
+    ]);
 
   return (
     <div>
@@ -29,6 +31,7 @@ export default async function PatrimonioManutencaoPage() {
         <AbrirManutencaoModal
           equipamentos={equipamentos ?? []}
           colaboradores={colaboradores ?? []}
+          safras={safras ?? []}
           action={criarManutencao}
           trigger={
             <Button type="button">
@@ -49,6 +52,7 @@ export default async function PatrimonioManutencaoPage() {
                   <th className="px-6 py-3 font-medium">Data</th>
                   <th className="px-6 py-3 font-medium">Serviço</th>
                   <th className="px-6 py-3 font-medium">Responsável</th>
+                  <th className="px-6 py-3 font-medium">Safra</th>
                   <th className="px-6 py-3 font-medium">Peças</th>
                   <th className="px-6 py-3 font-medium">Custo total</th>
                   <th className="px-6 py-3"></th>
@@ -58,13 +62,16 @@ export default async function PatrimonioManutencaoPage() {
                 {manutencoes.map((m) => {
                   const equipamento = Array.isArray(m.equipamentos) ? m.equipamentos[0] : m.equipamentos;
                   const responsavel = Array.isArray(m.colaboradores) ? m.colaboradores[0] : m.colaboradores;
+                  const safra = Array.isArray(m.safras) ? m.safras[0] : m.safras;
                   return (
                     <ManutencaoRow
                       key={m.id}
                       equipamentoNome={equipamento?.nome ?? "—"}
                       responsavelNome={responsavel?.nome}
+                      safraNome={safra?.nome}
                       equipamentos={equipamentos ?? []}
                       colaboradores={colaboradores ?? []}
+                      safras={safras ?? []}
                       manutencao={{
                         id: m.id,
                         equipamentoId: m.equipamento_id,
@@ -74,6 +81,7 @@ export default async function PatrimonioManutencaoPage() {
                         maoDeObra: m.mao_de_obra,
                         pecas: Array.isArray(m.pecas) ? m.pecas : [],
                         responsavelId: m.responsavel_id,
+                        safraId: m.safra_id,
                         notaFiscalUrl: m.nota_fiscal_url,
                       }}
                       atualizarAction={atualizarManutencao}

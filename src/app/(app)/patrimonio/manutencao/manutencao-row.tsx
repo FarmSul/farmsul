@@ -12,16 +12,20 @@ export function ManutencaoRow({
   manutencao,
   equipamentoNome,
   responsavelNome,
+  safraNome,
   equipamentos,
   colaboradores,
+  safras,
   atualizarAction,
   excluirAction,
 }: {
   manutencao: ManutencaoExistente & { custo: number };
   equipamentoNome: string;
   responsavelNome: string | undefined;
+  safraNome: string | undefined;
   equipamentos: { id: string; nome: string }[];
   colaboradores: { id: string; nome: string }[];
+  safras: { id: string; nome: string }[];
   atualizarAction: (formData: FormData) => void;
   excluirAction: (formData: FormData) => void;
 }) {
@@ -31,6 +35,7 @@ export function ManutencaoRow({
     <AbrirManutencaoModal
       equipamentos={equipamentos}
       colaboradores={colaboradores}
+      safras={safras}
       manutencao={manutencao}
       action={atualizarAction}
       trigger={
@@ -41,6 +46,7 @@ export function ManutencaoRow({
           </td>
           <td className="px-6 py-3.5 text-muted-foreground">{manutencao.descricao}</td>
           <td className="px-6 py-3.5 text-muted-foreground">{responsavelNome ?? "—"}</td>
+          <td className="px-6 py-3.5 text-muted-foreground">{safraNome ?? "—"}</td>
           <td className="px-6 py-3.5 text-muted-foreground">
             {pecas.length ? `${pecas.length} peça${pecas.length > 1 ? "s" : ""}` : "—"}
           </td>

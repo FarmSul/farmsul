@@ -11,6 +11,7 @@ type Peca = { nome: string; quantidade: number; valorUnitario: number };
 export type ManutencaoExistente = {
   id: string;
   equipamentoId: string;
+  safraId: string | null;
   data: string;
   descricao: string;
   maoDeObra: number;
@@ -28,6 +29,9 @@ export function AbrirManutencaoModal({
   equipamentos,
   equipamentoFixo,
   colaboradores,
+  safras,
+  safraFixa,
+  etapaFixa,
   action,
   manutencao,
 }: {
@@ -35,6 +39,9 @@ export function AbrirManutencaoModal({
   equipamentos?: { id: string; nome: string }[];
   equipamentoFixo?: { id: string; nome: string };
   colaboradores: { id: string; nome: string }[];
+  safras?: { id: string; nome: string }[];
+  safraFixa?: { id: string; nome: string };
+  etapaFixa?: string;
   action: (formData: FormData) => void;
   manutencao?: ManutencaoExistente;
 }) {
@@ -119,6 +126,7 @@ export function AbrirManutencaoModal({
             className="flex flex-col gap-4"
           >
             {manutencao && <input type="hidden" name="id" value={manutencao.id} />}
+            {etapaFixa && <input type="hidden" name="etapa" value={etapaFixa} />}
 
             {equipamentoFixo ? (
               <>
@@ -181,20 +189,41 @@ export function AbrirManutencaoModal({
               />
             </FieldGroup>
 
-            <FieldGroup label="Colaborador responsável (opcional)" htmlFor="responsavel-manutencao">
-              <Select
-                id="responsavel-manutencao"
-                name="responsavel_id"
-                defaultValue={manutencao?.responsavelId ?? ""}
-              >
-                <option value="">Nenhum</option>
-                {colaboradores.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome}
-                  </option>
-                ))}
-              </Select>
-            </FieldGroup>
+            <div className="grid grid-cols-2 gap-4">
+              <FieldGroup label="Colaborador responsável (opcional)" htmlFor="responsavel-manutencao">
+                <Select
+                  id="responsavel-manutencao"
+                  name="responsavel_id"
+                  defaultValue={manutencao?.responsavelId ?? ""}
+                >
+                  <option value="">Nenhum</option>
+                  {colaboradores.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
+                  ))}
+                </Select>
+              </FieldGroup>
+
+              {safraFixa ? (
+                <div>
+                  <span className="mb-1.5 block text-sm font-medium text-foreground">Safra</span>
+                  <input type="hidden" name="safra_id" value={safraFixa.id} />
+                  <p className="flex h-[38px] items-center text-sm text-muted-foreground">{safraFixa.nome}</p>
+                </div>
+              ) : (
+                <FieldGroup label="Safra (opcional)" htmlFor="safra-manutencao">
+                  <Select id="safra-manutencao" name="safra_id" defaultValue={manutencao?.safraId ?? ""}>
+                    <option value="">Nenhuma</option>
+                    {safras?.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.nome}
+                      </option>
+                    ))}
+                  </Select>
+                </FieldGroup>
+              )}
+            </div>
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
