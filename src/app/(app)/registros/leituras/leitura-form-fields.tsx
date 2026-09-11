@@ -25,7 +25,7 @@ export function LeituraFormFields({
 }) {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Estação" htmlFor={`${idPrefix}estacao-leitura`}>
           <Select id={`${idPrefix}estacao-leitura`} name="estacao_id" required defaultValue={defaultEstacaoId}>
             {estacoes.map((e) => (
@@ -58,7 +58,7 @@ export function LeituraFormFields({
         />
       </FieldGroup>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FieldGroup label="Temperatura (°C)" htmlFor={`${idPrefix}temperatura-leitura`}>
           <Input
             id={`${idPrefix}temperatura-leitura`}

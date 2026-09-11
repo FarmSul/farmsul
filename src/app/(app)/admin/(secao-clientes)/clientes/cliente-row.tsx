@@ -77,7 +77,7 @@ export function ClienteRow({
               <Input id={`nome-${id}`} name="nome" defaultValue={nome} required />
             </FieldGroup>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Plano" htmlFor={`plano-${id}`}>
                 <Select id={`plano-${id}`} name="plano" defaultValue={plano}>
                   <option value="essencial">Essencial</option>
@@ -94,7 +94,7 @@ export function ClienteRow({
               <Input id={`responsavel-${id}`} name="responsavel" defaultValue={responsavel ?? ""} placeholder="Nome do responsável" />
             </FieldGroup>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FieldGroup label="UF" htmlFor={`uf-${id}`}>
                 <Select id={`uf-${id}`} name="uf" defaultValue={uf ?? ""}>
                   <option value="">—</option>

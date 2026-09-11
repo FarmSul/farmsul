@@ -79,7 +79,7 @@ export function InsumoFormFields({
         />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Categoria" htmlFor={`${idPrefix}categoria-insumo`}>
           <Select id={`${idPrefix}categoria-insumo`} name="categoria" defaultValue={defaultCategoria}>
             <option value="semente">Semente</option>
@@ -105,7 +105,7 @@ export function InsumoFormFields({
         </FieldGroup>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup
           label={`Tamanho da embalagem (opcional, ${unidade})`}
           htmlFor={`${idPrefix}tamanho-embalagem-insumo`}
@@ -151,7 +151,7 @@ export function InsumoFormFields({
         />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label={`Valor por ${unidade} (R$, opcional)`} htmlFor={`${idPrefix}custo-insumo`}>
           <Input
             id={`${idPrefix}custo-insumo`}

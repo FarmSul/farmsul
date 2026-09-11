@@ -21,7 +21,7 @@ export function NovaNotaModal({ action }: { action: (formData: FormData) => void
         </Button>
       }
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Número" htmlFor="numero-nf">
           <Input id="numero-nf" name="numero" placeholder="000123" required />
         </FieldGroup>
@@ -37,7 +37,7 @@ export function NovaNotaModal({ action }: { action: (formData: FormData) => void
         <Input id="descricao-nf" name="descricao" placeholder="Venda de soja, compra de insumo..." />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Valor (R$)" htmlFor="valor-nf">
           <Input id="valor-nf" name="valor" type="number" step="0.01" min="0.01" placeholder="0,00" required />
         </FieldGroup>

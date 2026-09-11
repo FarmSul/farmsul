@@ -45,7 +45,7 @@ export function EnderecoFields({
   }, [estado]);
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <FieldGroup label="UF" htmlFor={`${idPrefix}-estado`}>
         <Select
           id={`${idPrefix}-estado`}

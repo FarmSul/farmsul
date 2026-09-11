@@ -22,7 +22,7 @@ export function NovoContratoModal({ action }: { action: (formData: FormData) => 
         <Input id="titulo-contrato" name="titulo" placeholder="Arrendamento Talhão 3" required />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Tipo" htmlFor="tipo-contrato">
           <Select id="tipo-contrato" name="tipo" defaultValue="arrendamento">
             <option value="arrendamento">Arrendamento</option>
@@ -41,7 +41,7 @@ export function NovoContratoModal({ action }: { action: (formData: FormData) => 
         <Input id="valor-contrato" name="valor" type="number" step="0.01" min="0.01" placeholder="0,00" />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Início" htmlFor="inicio-contrato">
           <Input id="inicio-contrato" name="data_inicio" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
         </FieldGroup>

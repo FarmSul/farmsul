@@ -54,7 +54,7 @@ export function NovaMovimentacaoModal({
       {movimentacao && <input type="hidden" name="id" value={movimentacao.id} />}
       {etapaFixa && <input type="hidden" name="etapa" value={etapaFixa} />}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Produto" htmlFor="produto-est">
           <Input id="produto-est" name="produto" placeholder="Soja, milho..." required defaultValue={movimentacao?.produto ?? ""} />
         </FieldGroup>
@@ -98,7 +98,7 @@ export function NovaMovimentacaoModal({
         )
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Quantidade" htmlFor="quantidade-est">
           <Input
             id="quantidade-est"
@@ -120,7 +120,7 @@ export function NovaMovimentacaoModal({
         </FieldGroup>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Local (opcional)" htmlFor="local-est">
           <Input id="local-est" name="local" placeholder="Silo 1, armazém..." defaultValue={movimentacao?.local ?? ""} />
         </FieldGroup>

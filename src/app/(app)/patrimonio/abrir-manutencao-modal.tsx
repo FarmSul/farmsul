@@ -155,7 +155,7 @@ export function AbrirManutencaoModal({
               </FieldGroup>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Data" htmlFor="data-manutencao">
                 <Input
                   id="data-manutencao"
@@ -189,7 +189,7 @@ export function AbrirManutencaoModal({
               />
             </FieldGroup>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Colaborador responsável (opcional)" htmlFor="responsavel-manutencao">
                 <Select
                   id="responsavel-manutencao"

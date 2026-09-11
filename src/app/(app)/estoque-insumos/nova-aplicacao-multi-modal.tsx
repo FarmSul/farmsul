@@ -245,7 +245,7 @@ export function NovaAplicacaoMultiModal({
             {etapaFixa && <input type="hidden" name="etapa" value={etapaFixa} />}
             <input type="hidden" name="numero" value={numero} />
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FieldGroup label="Talhão" htmlFor="talhao-aplicacao-multi">
                 <Select
                   id="talhao-aplicacao-multi"
@@ -347,7 +347,7 @@ export function NovaAplicacaoMultiModal({
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                         <div>
                           <span className="mb-1 block text-xs text-muted-foreground">Dose ({insumo?.unidade ?? ""}/ha)</span>
                           <Input

@@ -24,7 +24,7 @@ export function NovoClienteModal({ action }: { action: (formData: FormData) => v
         <Input id="nome-novo" name="nome" placeholder="Fazenda Nova" required />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Plano" htmlFor="plano-novo">
           <Select id="plano-novo" name="plano" defaultValue="essencial">
             <option value="essencial">Essencial</option>
@@ -41,7 +41,7 @@ export function NovoClienteModal({ action }: { action: (formData: FormData) => v
         <Input id="responsavel-novo" name="responsavel" placeholder="Nome do responsável" />
       </FieldGroup>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FieldGroup label="UF" htmlFor="uf-novo">
           <Select id="uf-novo" name="uf" defaultValue="">
             <option value="">—</option>

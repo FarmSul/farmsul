@@ -53,7 +53,7 @@ export function NovoLancamentoModal({
     >
       {lancamento && <input type="hidden" name="id" value={lancamento.id} />}
       {etapaFixa && <input type="hidden" name="etapa" value={etapaFixa} />}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Tipo" htmlFor="tipo-lanc">
           <Select id="tipo-lanc" name="tipo" defaultValue={lancamento?.tipo ?? defaultTipo}>
             <option value="receita">Receita</option>
@@ -87,7 +87,7 @@ export function NovoLancamentoModal({
         />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Valor (R$)" htmlFor="valor-lanc">
           <Input
             id="valor-lanc"

@@ -93,7 +93,7 @@ export function NovaEntradaModal({
             }}
             className="flex flex-col gap-4"
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Insumo" htmlFor="insumo-entrada">
                 <Select id="insumo-entrada" name="insumo_id" required value={insumoId} onChange={(e) => setInsumoId(e.target.value)}>
                   {insumos.map((i) => (
@@ -109,7 +109,7 @@ export function NovaEntradaModal({
             </div>
 
             {tamanhoEmbalagem ? (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FieldGroup
                   label={`Embalagens (de ${tamanhoEmbalagem} ${insumo?.unidade})`}
                   htmlFor="qtd-embalagens-entrada"

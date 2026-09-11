@@ -18,7 +18,7 @@ export function NovoLoteModal({ action }: { action: (formData: FormData) => void
         </Button>
       }
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Identificação" htmlFor="identificacao-lote">
           <Input id="identificacao-lote" name="identificacao" placeholder="Lote 01 - Pasto Norte" required />
         </FieldGroup>
@@ -34,7 +34,7 @@ export function NovoLoteModal({ action }: { action: (formData: FormData) => void
         </FieldGroup>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Quantidade" htmlFor="quantidade-lote">
           <Input id="quantidade-lote" name="quantidade" type="number" min="1" placeholder="0" required />
         </FieldGroup>

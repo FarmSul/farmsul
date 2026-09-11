@@ -167,7 +167,7 @@ export function AbastecimentoModal({
               </FieldGroup>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Combustível" htmlFor="insumo-abastecimento">
                 <Select
                   id="insumo-abastecimento"
@@ -194,7 +194,7 @@ export function AbastecimentoModal({
               </FieldGroup>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label={`Litros (${combustivelSelecionado?.unidade ?? "l"})`} htmlFor="litros-abastecimento">
                 <Input
                   id="litros-abastecimento"
@@ -235,7 +235,7 @@ export function AbastecimentoModal({
 
             {safraFixa && <input type="hidden" name="safra_id" value={safraFixa.id} />}
 
-            <div className={safraFixa ? "" : "grid grid-cols-2 gap-4"}>
+            <div className={safraFixa ? "" : "grid grid-cols-1 gap-4 sm:grid-cols-2"}>
               <FieldGroup label="Horímetro / hodômetro atual (opcional)" htmlFor="horimetro-abastecimento">
                 <Input
                   id="horimetro-abastecimento"

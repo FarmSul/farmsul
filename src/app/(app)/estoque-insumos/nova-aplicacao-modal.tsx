@@ -153,7 +153,7 @@ export function NovaAplicacaoModal({
               </Select>
             </FieldGroup>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Talhão" htmlFor="talhao-aplicacao">
                 <Select
                   id="talhao-aplicacao"
@@ -192,7 +192,7 @@ export function NovaAplicacaoModal({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label={`Dose por hectare (${insumo?.unidade ?? ""}/ha, opcional)`} htmlFor="dose-aplicacao">
                 <Input
                   id="dose-aplicacao"
@@ -231,7 +231,7 @@ export function NovaAplicacaoModal({
               </p>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldGroup label="Custo total (R$, opcional)" htmlFor="custo-aplicacao">
                 <Input
                   id="custo-aplicacao"

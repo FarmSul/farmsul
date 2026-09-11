@@ -1027,7 +1027,7 @@ function SimulacaoTab({
           className="flex flex-col gap-4"
         >
           <input type="hidden" name="id" value={safra.id} />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldGroup label="Sacas previstas" htmlFor="sacas-previstas">
               <Input
                 id="sacas-previstas"

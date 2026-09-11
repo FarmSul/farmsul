@@ -94,7 +94,7 @@ export function EquipamentoFormFields({
         />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Tipo" htmlFor={`${idPrefix}tipo-equipamento`}>
           <Select
             id={`${idPrefix}tipo-equipamento`}
@@ -149,7 +149,7 @@ export function EquipamentoFormFields({
         <Input id={`${idPrefix}modelo-equipamento`} name="modelo" placeholder="6110J" defaultValue={defaultModelo} />
       </FieldGroup>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Fabricante (opcional)" htmlFor={`${idPrefix}fabricante-equipamento`}>
           <Input
             id={`${idPrefix}fabricante-equipamento`}
@@ -172,7 +172,7 @@ export function EquipamentoFormFields({
         </FieldGroup>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Vida útil, h (opcional)" htmlFor={`${idPrefix}vida-util-equipamento`}>
           <Input
             id={`${idPrefix}vida-util-equipamento`}
@@ -197,7 +197,7 @@ export function EquipamentoFormFields({
         </FieldGroup>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldGroup label="Data de aquisição (opcional)" htmlFor={`${idPrefix}data-aquisicao-equipamento`}>
           <Input id={`${idPrefix}data-aquisicao-equipamento`} name="data_aquisicao" type="date" defaultValue={defaultDataAquisicao} />
         </FieldGroup>

@@ -30,13 +30,14 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeftOpen,
+  Lock,
 } from "lucide-react";
 import { logout } from "@/app/(app)/dashboard/actions";
 import { Avatar } from "@/components/ui/avatar";
 import { ProfileModal } from "@/components/profile-modal";
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
-type LeafItem = { href: string; label: string; icon: IconType; match?: string[] };
+type LeafItem = { href: string; label: string; icon: IconType; match?: string[]; locked?: boolean };
 type GroupItem = { label: string; icon: IconType; children: LeafItem[] };
 
 const TENANT_NAV_ITEMS: LeafItem[] = [
@@ -48,10 +49,10 @@ const TENANT_NAV_ITEMS: LeafItem[] = [
     icon: Tractor,
     match: ["/patrimonio", "/patrimonio/ativos", "/patrimonio/manutencao", "/patrimonio/abastecimento"],
   },
-  { href: "/financeiro", label: "Financeiro", icon: Banknote },
+  { href: "/financeiro", label: "Financeiro", icon: Banknote, locked: true },
   { href: "/fiscal", label: "Fiscal", icon: FileCheck2 },
   { href: "/contratos", label: "Contratos", icon: FileSignature },
-  { href: "/pecuaria", label: "Pecuária", icon: Beef },
+  { href: "/pecuaria", label: "Pecuária", icon: Beef, locked: true },
   {
     href: "/registros",
     label: "Registros",
@@ -64,7 +65,7 @@ const TENANT_NAV_ITEMS: LeafItem[] = [
     icon: Database,
     match: ["/estoque-insumos", "/estoque-insumos/movimentacoes"],
   },
-  { href: "/estoque-producao", label: "Estq. Produção", icon: Warehouse },
+  { href: "/estoque-producao", label: "Estq. Produção", icon: Warehouse, locked: true },
 ];
 
 const TENANT_SISTEMA_ITEM: LeafItem = { href: "/configuracoes", label: "Configurações", icon: Settings };
@@ -128,6 +129,22 @@ function NavLeaf({
   onNavigate?: () => void;
 }) {
   const active = (item.match ?? [item.href]).includes(pathname);
+
+  if (item.locked) {
+    return (
+      <div
+        title={collapsed ? `${item.label} (em breve)` : "Em breve"}
+        className={`flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground/50 ${
+          collapsed ? "justify-center px-0" : ""
+        }`}
+      >
+        <item.icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2} />
+        {!collapsed && <span className="flex-1">{item.label}</span>}
+        {!collapsed && <Lock className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />}
+      </div>
+    );
+  }
+
   return (
     <Link
       href={item.href}
