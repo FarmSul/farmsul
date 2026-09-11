@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@import "open-props/easings";
+@import "open-props/shadows/light";
+@import "open-props/shadows/dark" (prefers-color-scheme: dark);
+
+:root {
+  --background: #f7f6f2;
+  --surface: #ffffff;
+  --surface-hover: #f2f1ec;
+  --foreground: #1c211d;
+  --muted-foreground: #656d64;
+  --border: #e3e0d5;
+  --primary: #206b45;
+  --primary-hover: #17532f;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e6f2ea;
+  --danger: #b3392b;
+  --danger-hover: #942e22;
+  --danger-soft: #fbeae7;
+  --ring: #206b45;
+  --banner-from: #23875a;
+  --banner-to: #0d2e1c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-soft: var(--danger-soft);
+  --color-ring: var(--ring);
+  --color-banner-from: var(--banner-from);
+  --color-banner-to: var(--banner-to);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d100e;
+    --surface: #161a17;
+    --surface-hover: #1d2320;
+    --foreground: #eef0ec;
+    --muted-foreground: #9aa39c;
+    --border: #262b27;
+    --primary: #3f9d68;
+    --primary-hover: #56b47e;
+    --primary-foreground: #06120b;
+    --primary-soft: #14251c;
+    --danger: #e5534b;
+    --danger-hover: #ee6d66;
+    --danger-soft: #2a1512;
+    --ring: #3f9d68;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
