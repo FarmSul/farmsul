@@ -36,7 +36,7 @@ export default async function ConfiguracoesPage() {
         icon={Settings}
         title="Configurações"
         description="Dados cadastrais, plano e uso da sua empresa."
-        tags={["Empresa", "Plano"]}
+        tags={["Empresa", "Plano", "Sistema"]}
       />
 
       <ConfiguracoesDetail

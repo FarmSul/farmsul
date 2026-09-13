@@ -121,6 +121,7 @@ export default async function PatrimonioAtivosPage() {
                   <th className="px-6 py-3 font-medium">Tipo</th>
                   <th className="px-6 py-3 font-medium">Aquisição</th>
                   <th className="px-6 py-3 font-medium">Valor</th>
+                  <th className="px-6 py-3 font-medium">Valor atual</th>
                   <th className="px-6 py-3 font-medium">Status</th>
                   <th className="px-6 py-3"></th>
                 </tr>

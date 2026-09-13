@@ -2,9 +2,10 @@
 
 import * as Tabs from "@radix-ui/react-tabs";
 import { useEffect, useRef, useState } from "react";
-import { Building2, CreditCard, MapPin, LandPlot, Users } from "lucide-react";
+import { Building2, CreditCard, MapPin, LandPlot, Users, Settings, Sun, Moon, Monitor } from "lucide-react";
 import { UFS } from "@/lib/ufs";
 import type { PLANOS } from "@/lib/planos";
+import { useTema, setTema, type Tema } from "@/lib/theme";
 import { Card, CardHeader } from "@/components/ui/card";
 import { IconStatCard } from "@/components/ui/icon-stat-card";
 import { FieldGroup, Input, Select } from "@/components/ui/field";
@@ -30,7 +31,48 @@ function formatDataLonga(data: string) {
 const TABS = [
   { value: "empresa", label: "Empresa", icon: Building2 },
   { value: "plano", label: "Plano", icon: CreditCard },
+  { value: "sistema", label: "Sistema", icon: Settings },
 ];
+
+const OPCOES_TEMA: { value: Tema; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Claro", icon: Sun },
+  { value: "dark", label: "Escuro", icon: Moon },
+  { value: "system", label: "Sistema", icon: Monitor },
+];
+
+function SistemaTab() {
+  const tema = useTema();
+
+  return (
+    <Card className="p-5">
+      <h3 className="mb-1 text-sm font-semibold text-foreground">Aparência</h3>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Escolha como o FarmSul aparece pra você. &quot;Sistema&quot; segue automaticamente o tema do seu
+        computador ou navegador.
+      </p>
+      <div className="grid grid-cols-3 gap-2 sm:max-w-md">
+        {OPCOES_TEMA.map((o) => {
+          const ativo = tema === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => setTema(o.value)}
+              className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
+                ativo
+                  ? "border-primary bg-primary-soft text-primary"
+                  : "border-border text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+              }`}
+            >
+              <o.icon className="h-5 w-5" />
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
 
 function AnimatedTabsList({ value }: { value: string }) {
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -198,6 +240,10 @@ export function ConfiguracoesDetail({
             </p>
           </Card>
         </div>
+      </Tabs.Content>
+
+      <Tabs.Content value="sistema">
+        <SistemaTab />
       </Tabs.Content>
     </Tabs.Root>
   );

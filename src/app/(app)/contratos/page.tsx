@@ -13,6 +13,10 @@ function formatBRL(valor: number | null) {
   return valor == null ? "—" : valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function ContratosPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -60,7 +64,7 @@ export default async function ContratosPage() {
                     <td className="px-6 py-3.5 text-muted-foreground">{c.contraparte ?? "—"}</td>
                     <td className="px-6 py-3.5 text-muted-foreground">{formatBRL(c.valor)}</td>
                     <td className="px-6 py-3.5 text-muted-foreground">
-                      {c.data_inicio} {c.data_fim ? `— ${c.data_fim}` : ""}
+                      {formatDataCurta(c.data_inicio)} {c.data_fim ? `— ${formatDataCurta(c.data_fim)}` : ""}
                     </td>
                     <td className="px-6 py-3.5">
                       <Badge tone={c.status === "ativo" ? "neutral" : "danger"}>{c.status}</Badge>

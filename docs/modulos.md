@@ -36,6 +36,14 @@ foto), manutenções (peças + mão de obra, nota fiscal anexada, rateio opciona
 por safra) e abastecimentos (litros, custo, horímetro, rateio opcional por
 safra).
 
+**Depreciação** (`depreciacao.ts`): linear por horas de uso — `valor de
+aquisição ÷ vida útil em horas × horímetro atual`, sem valor residual (deprecia
+até zero ao fim da vida útil). Decisão explícita do usuário: aplicada a
+qualquer tipo de equipamento, mesmo os que não têm "horas de uso" no sentido
+literal (silo, pivô, benfeitoria) — pra esses, o cálculo só aparece se
+horímetro e vida útil em horas forem preenchidos; senão mostra "—". Exibida na
+listagem de Ativos, no cadastro de cada equipamento e agregada na Visão Geral.
+
 ## Estoque de Insumos (`/estoque-insumos`, `/movimentacoes`)
 
 Cadastro de insumos por categoria (semente, fertilizante, defensivo, corretivo,

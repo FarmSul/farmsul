@@ -47,3 +47,25 @@ function getTemaServerSnapshot(): Tema {
 export function useTema(): Tema {
   return useSyncExternalStore(subscribeTema, getTema, getTemaServerSnapshot);
 }
+
+function subscribeSistemaEscuro(callback: () => void) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getSistemaEscuroSnapshot(): boolean {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function getSistemaEscuroServerSnapshot(): boolean {
+  return false;
+}
+
+/** Tema realmente aplicado na tela agora ("system" já resolvido em light/dark). */
+export function useTemaEfetivo(): "light" | "dark" {
+  const tema = useTema();
+  const sistemaEscuro = useSyncExternalStore(subscribeSistemaEscuro, getSistemaEscuroSnapshot, getSistemaEscuroServerSnapshot);
+  if (tema === "system") return sistemaEscuro ? "dark" : "light";
+  return tema;
+}

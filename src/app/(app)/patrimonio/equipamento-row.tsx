@@ -12,6 +12,11 @@ import { EquipamentoFormFields } from "./equipamento-form-fields";
 import { AbrirManutencaoModal } from "./abrir-manutencao-modal";
 import { AbastecimentoModal, type Combustivel } from "./abastecimento-modal";
 import { TIPO_LABELS, TIPO_MAQUINA_LABELS, STATUS_LABELS } from "./labels";
+import { calcularDepreciacao } from "./depreciacao";
+
+function formatBRL(valor: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
+}
 
 type Manutencao = {
   id: string;
@@ -43,6 +48,10 @@ function formatDataLonga(data: string) {
     month: "long",
     year: "numeric",
   });
+}
+
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
 }
 
 function AnimatedTabsList({ value }: { value: string }) {
@@ -107,6 +116,7 @@ function DadosTab({
   onSaved: () => void;
 }) {
   const [pending, startTransition] = useTransition();
+  const depreciacao = calcularDepreciacao(dados.valorAquisicao, dados.vidaUtilHoras, dados.horimetroAtual);
 
   return (
     <form
@@ -121,6 +131,23 @@ function DadosTab({
       className="flex flex-col gap-4"
     >
       <input type="hidden" name="id" value={dados.id} />
+
+      {depreciacao && (
+        <div className="grid grid-cols-3 gap-3 rounded-lg bg-surface-hover p-3 text-center">
+          <div>
+            <p className="text-sm font-semibold text-foreground">{formatBRL(depreciacao.valorAtual)}</p>
+            <p className="text-xs text-muted-foreground">Valor atual</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">{formatBRL(depreciacao.depreciacaoAcumulada)}</p>
+            <p className="text-xs text-muted-foreground">Depreciação acumulada</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">{depreciacao.percentualDepreciado.toFixed(0)}%</p>
+            <p className="text-xs text-muted-foreground">Vida útil consumida</p>
+          </div>
+        </div>
+      )}
       <EquipamentoFormFields
         idPrefix={`edit-equip-${dados.id}-`}
         defaultNome={dados.nome}
@@ -355,6 +382,7 @@ export function EquipamentoRow({
 }) {
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState("dados");
+  const depreciacao = calcularDepreciacao(valorAquisicao, vidaUtilHoras, horimetroAtual);
 
   return (
     <Dialog.Root
@@ -385,11 +413,21 @@ export function EquipamentoRow({
                 : TIPO_LABELS[tipo] ?? tipo}
             </Badge>
           </td>
-          <td className="px-6 py-3.5 text-muted-foreground">{dataAquisicao ?? "—"}</td>
           <td className="px-6 py-3.5 text-muted-foreground">
-            {valorAquisicao != null
-              ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valorAquisicao)
-              : "—"}
+            {dataAquisicao ? formatDataCurta(dataAquisicao) : "—"}
+          </td>
+          <td className="px-6 py-3.5 text-muted-foreground">
+            {valorAquisicao != null ? formatBRL(valorAquisicao) : "—"}
+          </td>
+          <td className="px-6 py-3.5 text-muted-foreground">
+            {depreciacao ? (
+              <>
+                {formatBRL(depreciacao.valorAtual)}
+                <span className="ml-1 text-xs">({depreciacao.percentualDepreciado.toFixed(0)}% deprec.)</span>
+              </>
+            ) : (
+              <span title="Cadastre valor de aquisição e vida útil em horas pra calcular">—</span>
+            )}
           </td>
           <td className="px-6 py-3.5">
             <Badge tone={status === "manutencao" ? "amber" : status === "inativo" ? "neutral" : "primary"}>

@@ -13,6 +13,10 @@ function formatBRL(valor: number) {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function FiscalPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -60,7 +64,7 @@ export default async function FiscalPage() {
                       <Badge tone={n.tipo === "saida" ? "primary" : "blue"}>{n.tipo}</Badge>
                     </td>
                     <td className="px-6 py-3.5 text-muted-foreground">{formatBRL(n.valor)}</td>
-                    <td className="px-6 py-3.5 text-muted-foreground">{n.data_emissao}</td>
+                    <td className="px-6 py-3.5 text-muted-foreground">{formatDataCurta(n.data_emissao)}</td>
                     <td className="px-6 py-3.5">
                       <Badge tone={n.status === "emitida" ? "neutral" : "danger"}>{n.status}</Badge>
                     </td>

@@ -10,6 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function PecuariaPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -67,7 +71,7 @@ export default async function PecuariaPage() {
                     <td className="px-6 py-3.5 text-muted-foreground">
                       {l.peso_medio_kg ? `${l.peso_medio_kg} kg` : "—"}
                     </td>
-                    <td className="px-6 py-3.5 text-muted-foreground">{l.data_entrada}</td>
+                    <td className="px-6 py-3.5 text-muted-foreground">{formatDataCurta(l.data_entrada)}</td>
                     <td className="px-6 py-3.5 text-right">
                       <form action={excluirLote}>
                         <input type="hidden" name="id" value={l.id} />

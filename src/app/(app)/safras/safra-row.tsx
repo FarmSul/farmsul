@@ -5,6 +5,10 @@ import { Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export function SafraRow({
   id,
   nome,
@@ -40,7 +44,7 @@ export function SafraRow({
       </td>
       <td className="p-0">
         <Link href={`/safras/${id}`} className="block px-6 py-3.5 text-muted-foreground">
-          {dataInicio} {dataFim ? `— ${dataFim}` : ""}
+          {formatDataCurta(dataInicio)} {dataFim ? `— ${formatDataCurta(dataFim)}` : ""}
         </Link>
       </td>
       <td className="p-0">

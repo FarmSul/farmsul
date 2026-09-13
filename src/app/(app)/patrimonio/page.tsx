@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Tractor, Wrench, Receipt, Wallet, Fuel, ArrowRight } from "lucide-react";
+import { Tractor, Wrench, Receipt, Wallet, Fuel, ArrowRight, TrendingDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirectIfPlatformAdmin } from "@/lib/supabase/admin";
 import { TIPO_LABELS, TIPO_MAQUINA_LABELS } from "./labels";
 import { DonutChart } from "./donut-chart";
+import { calcularDepreciacao } from "./depreciacao";
 import { IconStatCard } from "@/components/ui/icon-stat-card";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +43,7 @@ export default async function PatrimonioVisaoGeralPage() {
   await redirectIfPlatformAdmin();
 
   const [{ data: equipamentos }, { data: manutencoes }, { data: abastecimentos }] = await Promise.all([
-    supabase.from("equipamentos").select("id, tipo, tipo_maquina, valor_aquisicao, status"),
+    supabase.from("equipamentos").select("id, tipo, tipo_maquina, valor_aquisicao, vida_util_horas, horimetro_atual, status"),
     supabase.from("manutencoes").select("id, custo"),
     supabase.from("abastecimentos").select("id, custo_total"),
   ]);
@@ -52,6 +53,13 @@ export default async function PatrimonioVisaoGeralPage() {
   const emManutencao = todos.filter((e) => e.status === "manutencao").length;
   const inativos = todos.filter((e) => e.status === "inativo").length;
   const valorTotal = todos.reduce((soma, e) => soma + (e.valor_aquisicao ?? 0), 0);
+
+  const depreciacoes = todos.map((e) => calcularDepreciacao(e.valor_aquisicao, e.vida_util_horas, e.horimetro_atual));
+  const valorAtualTotal = todos.reduce(
+    (soma, e, i) => soma + (depreciacoes[i]?.valorAtual ?? e.valor_aquisicao ?? 0),
+    0,
+  );
+  const depreciacaoAcumuladaTotal = depreciacoes.reduce((soma, d) => soma + (d?.depreciacaoAcumulada ?? 0), 0);
 
   const todasManutencoes = manutencoes ?? [];
   const custoManutencoes = todasManutencoes.reduce((soma, m) => soma + m.custo, 0);
@@ -74,8 +82,15 @@ export default async function PatrimonioVisaoGeralPage() {
 
   return (
     <div>
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <IconStatCard icon={Wallet} tone="primary" label="Valor do patrimônio" value={formatBRL(valorTotal)} hint={`${todos.length} equipamentos`} />
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-6">
+        <IconStatCard
+          icon={Wallet}
+          tone="primary"
+          label="Valor atual (depreciado)"
+          value={formatBRL(valorAtualTotal)}
+          hint={`${formatBRL(valorTotal)} em aquisição`}
+        />
+        <IconStatCard icon={TrendingDown} tone="rose" label="Depreciação acumulada" value={formatBRL(depreciacaoAcumuladaTotal)} />
         <IconStatCard icon={Tractor} tone="slate" label="Total de ativos" value={todos.length} />
         <IconStatCard icon={Wrench} tone="amber" label="Em manutenção" value={emManutencao} />
         <IconStatCard

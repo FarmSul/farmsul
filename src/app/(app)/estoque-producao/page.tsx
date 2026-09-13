@@ -9,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function EstoqueProducaoPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -63,7 +67,7 @@ export default async function EstoqueProducaoPage() {
                       </td>
                       <td className="px-6 py-3.5 text-muted-foreground">{safra?.nome ?? "—"}</td>
                       <td className="px-6 py-3.5 text-muted-foreground">{m.local ?? "—"}</td>
-                      <td className="px-6 py-3.5 text-muted-foreground">{m.data}</td>
+                      <td className="px-6 py-3.5 text-muted-foreground">{formatDataCurta(m.data)}</td>
                       <td className="px-6 py-3.5 text-right">
                         <form action={excluirMovimentacao}>
                           <input type="hidden" name="id" value={m.id} />

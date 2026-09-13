@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react";
+import { ThemeToggleButton } from "./theme-toggle-button";
 
 export function PageBanner({
   icon: Icon,
@@ -21,7 +22,8 @@ export function PageBanner({
           backgroundSize: "40px 40px",
         }}
       />
-      <div className="relative flex items-start gap-4">
+      <ThemeToggleButton className="absolute right-5 top-5 sm:right-7 sm:top-7" />
+      <div className="relative flex items-start gap-4 pr-10">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
           <Icon className="h-5 w-5 text-white" strokeWidth={2} />
         </div>

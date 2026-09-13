@@ -14,6 +14,10 @@ function formatBRL(valor: number) {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function FinanceiroPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -81,7 +85,7 @@ export default async function FinanceiroPage() {
                     <td className="px-6 py-3.5">
                       <Badge tone={l.status === "realizado" ? "neutral" : "amber"}>{l.status}</Badge>
                     </td>
-                    <td className="px-6 py-3.5 text-muted-foreground">{l.data}</td>
+                    <td className="px-6 py-3.5 text-muted-foreground">{formatDataCurta(l.data)}</td>
                     <td className="px-6 py-3.5 text-right">
                       <form action={excluirLancamento}>
                         <input type="hidden" name="id" value={l.id} />

@@ -143,6 +143,10 @@ function formatDataLonga(data: string) {
   return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 }
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 function custoDoEvento(e: EventoItem): number {
   if (e.evento === "lancamento") return e.tipo === "despesa" && e.status === "realizado" ? e.valor : 0;
   if (e.evento === "manutencao") return e.custo;
@@ -313,7 +317,7 @@ export function SafraDetail({
       <PageBanner
         icon={Sprout}
         title={safra.nome}
-        description={`${culturaLabel} · ${safra.dataInicio}${safra.dataFim ? ` — ${safra.dataFim}` : ""}`}
+        description={`${culturaLabel} · ${formatDataCurta(safra.dataInicio)}${safra.dataFim ? ` — ${formatDataCurta(safra.dataFim)}` : ""}`}
         tags={[culturaLabel, safra.tipoCusto === "manual" ? "Custo manual" : "Custo automático"]}
       />
 

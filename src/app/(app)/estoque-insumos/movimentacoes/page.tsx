@@ -22,6 +22,10 @@ function formatBRL(valor: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
 }
 
+function formatDataCurta(data: string) {
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
 export default async function MovimentacoesInsumoPage() {
   const supabase = await createClient();
   await redirectIfPlatformAdmin();
@@ -146,7 +150,7 @@ export default async function MovimentacoesInsumoPage() {
                       <td className="px-6 py-3.5 text-muted-foreground">{talhao?.nome ?? "—"}</td>
                       <td className="px-6 py-3.5 text-muted-foreground">{safra?.nome ?? "—"}</td>
                       <td className="px-6 py-3.5 text-muted-foreground">{m.custo_total != null ? formatBRL(m.custo_total) : "—"}</td>
-                      <td className="px-6 py-3.5 text-muted-foreground">{m.data}</td>
+                      <td className="px-6 py-3.5 text-muted-foreground">{formatDataCurta(m.data)}</td>
                       <td className="px-6 py-3.5 text-right">
                         <form action={excluirMovimentacaoInsumo}>
                           <input type="hidden" name="id" value={m.id} />

@@ -2,19 +2,17 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tabs from "@radix-ui/react-tabs";
-import { X, Camera, UserRound, Lock, Mail, Eye, EyeOff, TriangleAlert, Info, SunMoon, Sun, Moon, Monitor } from "lucide-react";
+import { X, Camera, UserRound, Lock, Mail, Eye, EyeOff, TriangleAlert, Info } from "lucide-react";
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { FieldGroup, Input } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { atualizarPerfil, trocarSenha, atualizarEmail } from "@/app/(app)/perfil/actions";
-import { useTema, setTema, type Tema } from "@/lib/theme";
 
 const TABS = [
   { value: "dados", label: "Dados", icon: UserRound },
   { value: "senha", label: "Senha", icon: Lock },
   { value: "email", label: "E-mail", icon: Mail },
-  { value: "aparencia", label: "Aparência", icon: SunMoon },
 ];
 
 function AnimatedTabsList({ value }: { value: string }) {
@@ -251,45 +249,6 @@ function EmailTab({ email }: { email: string }) {
   );
 }
 
-const OPCOES_TEMA: { value: Tema; label: string; icon: typeof Sun }[] = [
-  { value: "light", label: "Claro", icon: Sun },
-  { value: "dark", label: "Escuro", icon: Moon },
-  { value: "system", label: "Sistema", icon: Monitor },
-];
-
-function AparenciaTab() {
-  const tema = useTema();
-
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
-        Escolha como o FarmSul aparece pra você. &quot;Sistema&quot; segue automaticamente o tema do seu
-        computador ou navegador.
-      </p>
-      <div className="grid grid-cols-3 gap-2">
-        {OPCOES_TEMA.map((o) => {
-          const ativo = tema === o.value;
-          return (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => setTema(o.value)}
-              className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
-                ativo
-                  ? "border-primary bg-primary-soft text-primary"
-                  : "border-border text-muted-foreground hover:bg-surface-hover hover:text-foreground"
-              }`}
-            >
-              <o.icon className="h-5 w-5" />
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function ProfileModal({
   trigger,
   nome,
@@ -330,9 +289,6 @@ export function ProfileModal({
             </Tabs.Content>
             <Tabs.Content value="email">
               <EmailTab email={email} />
-            </Tabs.Content>
-            <Tabs.Content value="aparencia">
-              <AparenciaTab />
             </Tabs.Content>
           </Tabs.Root>
         </Dialog.Content>
