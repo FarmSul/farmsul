@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getTenantId } from "@/lib/supabase/tenant";
+import { getTenantId, requerGestao } from "@/lib/supabase/tenant";
 import { geocodeNominatim } from "@/lib/geocode";
 
 export async function criarEstacao(formData: FormData) {
@@ -46,6 +46,7 @@ export async function atualizarEstacao(formData: FormData) {
 
 export async function excluirEstacao(formData: FormData) {
   const supabase = await createClient();
+  await requerGestao(supabase);
   const id = formData.get("id") as string;
 
   const { error } = await supabase.from("estacoes_climaticas").delete().eq("id", id);

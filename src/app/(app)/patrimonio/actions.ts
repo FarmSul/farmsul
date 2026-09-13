@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getTenantId } from "@/lib/supabase/tenant";
+import { getTenantId, requerGestao } from "@/lib/supabase/tenant";
 import { uploadArquivo } from "@/lib/supabase/storage";
 
 async function uploadFoto(supabase: Awaited<ReturnType<typeof createClient>>, tenant_id: string, foto: File) {
@@ -77,6 +77,7 @@ export async function atualizarEquipamento(formData: FormData) {
 
 export async function excluirEquipamento(formData: FormData) {
   const supabase = await createClient();
+  await requerGestao(supabase);
   const id = formData.get("id") as string;
 
   const { error } = await supabase.from("equipamentos").delete().eq("id", id);

@@ -17,12 +17,17 @@ export const metadata: Metadata = {
   description: "Gestão de fazendas — FarmSul",
 };
 
+const TEMA_INICIAL_SCRIPT = `(function(){try{var t=localStorage.getItem("farmsul-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: TEMA_INICIAL_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

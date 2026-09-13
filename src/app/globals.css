@@ -44,7 +44,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #0d100e;
     --surface: #161a17;
     --surface-hover: #1d2320;
@@ -60,6 +60,25 @@
     --danger-soft: #2a1512;
     --ring: #3f9d68;
   }
+}
+
+/* Escolha manual do usuário (src/lib/theme.ts) — vence a preferência do
+   sistema operacional nos dois sentidos. */
+:root[data-theme="dark"] {
+  --background: #0d100e;
+  --surface: #161a17;
+  --surface-hover: #1d2320;
+  --foreground: #eef0ec;
+  --muted-foreground: #9aa39c;
+  --border: #262b27;
+  --primary: #3f9d68;
+  --primary-hover: #56b47e;
+  --primary-foreground: #06120b;
+  --primary-soft: #14251c;
+  --danger: #e5534b;
+  --danger-hover: #ee6d66;
+  --danger-soft: #2a1512;
+  --ring: #3f9d68;
 }
 
 * {

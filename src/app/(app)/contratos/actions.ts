@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getTenantId } from "@/lib/supabase/tenant";
+import { getTenantId, requerGestao } from "@/lib/supabase/tenant";
 
 export async function criarContrato(formData: FormData) {
   const supabase = await createClient();
@@ -42,6 +42,7 @@ export async function encerrarContrato(formData: FormData) {
 
 export async function excluirContrato(formData: FormData) {
   const supabase = await createClient();
+  await requerGestao(supabase);
   const id = formData.get("id") as string;
 
   const { error } = await supabase.from("contratos").delete().eq("id", id);

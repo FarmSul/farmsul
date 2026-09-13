@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getTenantId } from "@/lib/supabase/tenant";
+import { getTenantId, requerGestao } from "@/lib/supabase/tenant";
 
 export async function criarLote(formData: FormData) {
   const supabase = await createClient();
@@ -29,6 +29,7 @@ export async function criarLote(formData: FormData) {
 
 export async function excluirLote(formData: FormData) {
   const supabase = await createClient();
+  await requerGestao(supabase);
   const id = formData.get("id") as string;
 
   const { error } = await supabase.from("pecuaria_lotes").delete().eq("id", id);

@@ -21,6 +21,30 @@ export const getCachedUser = cache(async () => {
   return user;
 });
 
+/**
+ * Perfil (+ tenant) do usuário atual, cacheado por request. Várias telas
+ * (layout, dashboard, configurações...) precisavam do mesmo dado — cada uma
+ * fazendo sua própria consulta em `profiles`, multiplicando round-trips numa
+ * navegação só. Um único select "gordo" (união das colunas que qualquer tela
+ * usa) cacheado por `cache()` resolve isso: a 1ª chamada busca, as seguintes
+ * na mesma navegação reaproveitam.
+ */
+export const getPerfilAtual = cache(async () => {
+  const user = await getCachedUser();
+  if (!user) return null;
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select(
+      "nome_completo, papel, avatar_url, telefone, tenants(id, nome, plano, cnpj_cpf, responsavel, uf, cidade, cep, criado_em)",
+    )
+    .eq("id", user.id)
+    .single();
+
+  return data;
+});
+
 export const isPlatformAdmin = cache(async (): Promise<boolean> => {
   const user = await getCachedUser();
   if (!user) return false;

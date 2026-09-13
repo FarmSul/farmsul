@@ -3,18 +3,9 @@
 import { useState } from "react";
 import { FieldGroup, Input, Select } from "@/components/ui/field";
 import { AreasSafraFields } from "./areas-safra-fields";
+import { CULTURAS } from "./culturas";
 
-export const CULTURAS = [
-  { value: "soja", label: "Soja" },
-  { value: "milho", label: "Milho" },
-  { value: "sorgo", label: "Sorgo" },
-  { value: "milheto", label: "Milheto" },
-  { value: "trigo", label: "Trigo" },
-  { value: "feijao", label: "Feijão" },
-  { value: "arroz", label: "Arroz" },
-  { value: "algodao", label: "Algodão" },
-  { value: "outra", label: "Outra" },
-] as const;
+export { CULTURAS };
 
 const TIPOS_CUSTO = [
   {

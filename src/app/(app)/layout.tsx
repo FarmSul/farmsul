@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCachedUser, isPlatformAdmin } from "@/lib/supabase/admin";
+import { getCachedUser, getPerfilAtual, isPlatformAdmin } from "@/lib/supabase/admin";
 import { AppShell } from "@/components/app-shell";
 
 export default async function AppLayout({
@@ -14,11 +13,7 @@ export default async function AppLayout({
     redirect("/login");
   }
 
-  const supabase = await createClient();
-  const [{ data: perfil }, admin] = await Promise.all([
-    supabase.from("profiles").select("nome_completo, papel, avatar_url, telefone").eq("id", user.id).single(),
-    isPlatformAdmin(),
-  ]);
+  const [perfil, admin] = await Promise.all([getPerfilAtual(), isPlatformAdmin()]);
 
   return (
     <AppShell
